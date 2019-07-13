@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-
 import { Observable, of } from 'rxjs'
 import { catchError, map, tap } from 'rxjs/operators'
 
@@ -13,7 +12,7 @@ const httpOptions = {
 
 @Injectable({ providedIn: 'root' })
 export class HeroService {
-  private heroesUrl = 'api/heroes' // URL to web api
+  private heroesUrl = 'api/heroes'
 
   constructor(
     private http: HttpClient,

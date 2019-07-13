@@ -28,19 +28,25 @@ describe('MessageService simple tests', () => {
 
     expect(service.messages.length).toBe(0)
   })
+
+  it('should add async', async () => {
+    const message = 'an async message'
+    expectAsync(service.addWithDelay(message)).toBeResolvedTo(message)
+  })
 })
 
 describe('MessageService tests using TestBed', () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [MessageService]
-    })
+    TestBed.configureTestingModule({})
   })
 
-  it('should be created', inject(
-    [MessageService],
-    (service: MessageService) => {
-      expect(service).toBeTruthy()
-    }
-  ))
+  it('should be created via the TestBed', () => {
+    const service = TestBed.get(MessageService)
+
+    expect(service).toBeTruthy()
+  })
+
+  it('should add a message')
+
+  it('should clear messages')
 })
