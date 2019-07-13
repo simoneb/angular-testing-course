@@ -11,7 +11,7 @@ import {
 } from 'protractor'
 import { promise } from 'selenium-webdriver'
 
-const expectedH1 = 'Tour of Heroes'
+const expectedH1 = 'Angular Testing Course'
 const expectedTitle = `${expectedH1}`
 const targetHero = { id: 15, name: 'Magneta' }
 const targetHeroDashboardIndex = 3
@@ -350,7 +350,7 @@ describe('workspace-project App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo()
-    expect(page.getTitleText()).toEqual('Welcome to angular-testing-course!')
+    expect(page.getTitleText()).toEqual('Angular Testing Course')
   })
 
   afterEach(async () => {
