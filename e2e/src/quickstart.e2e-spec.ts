@@ -1,4 +1,5 @@
 import { browser, element, by, $$ } from 'protractor'
+import { writeScreenShot } from './testing/file-system'
 
 describe('tour of heroes e2e quick start', () => {
   beforeEach(() => {
@@ -53,5 +54,11 @@ describe('tour of heroes e2e quick start', () => {
     await magnetaLink.click()
 
     expect(await browser.getCurrentUrl()).toBe(magnetaUrl)
+  })
+
+  it('should take a screenshot', () => {
+    browser.takeScreenshot().then(png => {
+      writeScreenShot(png, __dirname + '/screenshots/screenshot.png')
+    })
   })
 })

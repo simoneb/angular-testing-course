@@ -12,6 +12,9 @@ import { HeroService } from '../hero.service'
   styleUrls: ['./hero-detail.component.css']
 })
 export class HeroDetailComponent implements OnInit {
+  lat = 45.40298
+  lng = 10.9659241
+
   @Input() hero: Hero
 
   constructor(
@@ -26,8 +29,8 @@ export class HeroDetailComponent implements OnInit {
 
   getHero(): void {
     this.route.paramMap
-      .pipe(switchMap((params) => this.heroService.getHero(+params.get('id'))))
-      .subscribe((hero) => (this.hero = hero))
+      .pipe(switchMap(params => this.heroService.getHero(+params.get('id'))))
+      .subscribe(hero => (this.hero = hero))
   }
 
   goBack(): void {

@@ -4,12 +4,31 @@ import { RouterTestingModule } from '@angular/router/testing'
 import { By } from '@angular/platform-browser'
 import { of } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
+import { Component, Input } from '@angular/core'
 
 import { HeroDetailComponent } from './hero-detail.component'
 import { HeroService } from '../hero.service'
 import { Hero } from '../hero'
 import { HEROES } from '../mock-heroes'
 import { ActivatedRouteStub } from '../testing/activated-route-stub'
+
+@Component({
+  selector: 'agm-map',
+  template: ''
+})
+class StubAgmMapComponent {
+  @Input() latitude: number
+  @Input() longitude: number
+}
+
+@Component({
+  selector: 'agm-marker',
+  template: ''
+})
+class StubAgmMarkerComponent {
+  @Input() latitude: number
+  @Input() longitude: number
+}
 
 describe('HeroDetailComponent', () => {
   let fixture: ComponentFixture<HeroDetailComponent>
@@ -19,7 +38,11 @@ describe('HeroDetailComponent', () => {
     const activatedRouteStub = new ActivatedRouteStub()
 
     TestBed.configureTestingModule({
-      declarations: [HeroDetailComponent],
+      declarations: [
+        HeroDetailComponent,
+        StubAgmMapComponent,
+        StubAgmMarkerComponent
+      ],
       imports: [FormsModule, RouterTestingModule.withRoutes([])],
       providers: [
         { provide: HeroService, useValue: heroServiceSpy },

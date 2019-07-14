@@ -1,15 +1,14 @@
 'use strict' // necessary for es6 output in node
 
-import { AppPage } from './app.po'
 import {
   browser,
   element,
   by,
   ElementFinder,
-  ElementArrayFinder,
-  logging
+  ElementArrayFinder
 } from 'protractor'
 import { promise } from 'selenium-webdriver'
+import { Hero } from './hero'
 
 const expectedH1 = 'Angular Testing Course'
 const expectedTitle = `${expectedH1}`
@@ -18,71 +17,8 @@ const targetHeroDashboardIndex = 3
 const nameSuffix = 'X'
 const newHeroName = targetHero.name + nameSuffix
 
-class Hero {
-  id: number
-  name: string
-
-  // Factory methods
-
-  // Hero from string formatted as '<id> <name>'.
-  static fromString(s: string): Hero {
-    return {
-      id: +s.substr(0, s.indexOf(' ')),
-      name: s.substr(s.indexOf(' ') + 1)
-    }
-  }
-
-  // Hero from hero list <li> element.
-  static async fromLi(li: ElementFinder): Promise<Hero> {
-    const stringsFromA = await li.all(by.css('a')).getText()
-    const strings = stringsFromA[0].split(' ')
-    return { id: +strings[0], name: strings[1] }
-  }
-
-  // Hero id and name from the given detail element.
-  static async fromDetail(detail: ElementFinder): Promise<Hero> {
-    // Get hero id from the first <div>
-    const id = await detail
-      .all(by.css('div'))
-      .first()
-      .getText()
-    // Get name from the h2
-    const name = await detail.element(by.css('h2')).getText()
-    return {
-      id: +id.substr(id.indexOf(' ') + 1),
-      name: name.substr(0, name.lastIndexOf(' '))
-    }
-  }
-}
-
-describe('Tutorial part 6', () => {
+describe('Tour Of Heroes', () => {
   beforeAll(() => browser.get(''))
-
-  function getPageElts() {
-    const navElts = element.all(by.css('app-root nav a'))
-
-    return {
-      navElts,
-
-      appDashboardHref: navElts.get(0),
-      appDashboard: element(by.css('app-root app-dashboard')),
-      topHeroes: element.all(
-        by.css('app-root app-dashboard app-dashboard-hero > div')
-      ),
-
-      appHeroesHref: navElts.get(1),
-      appHeroes: element(by.css('app-root app-heroes')),
-      allHeroes: element.all(by.css('app-root app-heroes li')),
-      selectedHeroSubview: element(
-        by.css('app-root app-heroes > div:last-child')
-      ),
-
-      heroDetail: element(by.css('app-root app-hero-detail > div')),
-
-      searchBox: element(by.css('#search-box')),
-      searchResults: element.all(by.css('.search-result li'))
-    }
-  }
 
   describe('Initial page', () => {
     it(`has title '${expectedTitle}'`, () => {
@@ -94,15 +30,15 @@ describe('Tutorial part 6', () => {
     })
 
     const expectedViewNames = ['Dashboard', 'Heroes']
+
     it(`has views ${expectedViewNames}`, () => {
-      const viewNames = getPageElts().navElts.map((el: ElementFinder) =>
-        el.getText()
-      )
+      const viewNames = getPageElements().navElements.map(el => el.getText())
+
       expect(viewNames).toEqual(expectedViewNames)
     })
 
     it('has dashboard as the active view', () => {
-      const page = getPageElts()
+      const page = getPageElements()
       expect(page.appDashboard.isPresent()).toBeTruthy()
     })
   })
@@ -111,7 +47,7 @@ describe('Tutorial part 6', () => {
     beforeAll(() => browser.get(''))
 
     it('has top heroes', () => {
-      const page = getPageElts()
+      const page = getPageElements()
       expect(page.topHeroes.count()).toEqual(4)
     })
 
@@ -127,9 +63,9 @@ describe('Tutorial part 6', () => {
 
     it(`cancels and shows ${targetHero.name} in Dashboard`, () => {
       element(by.buttonText('go back')).click()
-      browser.waitForAngular() // seems necessary to gets tests to pass for toh-pt6
+      browser.waitForAngular() // seems necessary to gets tests to pass
 
-      const targetHeroElt = getPageElts().topHeroes.get(
+      const targetHeroElt = getPageElements().topHeroes.get(
         targetHeroDashboardIndex
       )
       expect(targetHeroElt.getText()).toEqual(targetHero.name)
@@ -147,9 +83,9 @@ describe('Tutorial part 6', () => {
 
     it(`saves and shows ${newHeroName} in Dashboard`, () => {
       element(by.buttonText('save')).click()
-      browser.waitForAngular() // seems necessary to gets tests to pass for toh-pt6
+      browser.waitForAngular() // seems necessary to gets tests to pass
 
-      const targetHeroElt = getPageElts().topHeroes.get(
+      const targetHeroElt = getPageElements().topHeroes.get(
         targetHeroDashboardIndex
       )
       expect(targetHeroElt.getText()).toEqual(newHeroName)
@@ -160,8 +96,8 @@ describe('Tutorial part 6', () => {
     beforeAll(() => browser.get(''))
 
     it('can switch to Heroes view', () => {
-      getPageElts().appHeroesHref.click()
-      const page = getPageElts()
+      getPageElements().appHeroesHref.click()
+      const page = getPageElements()
       expect(page.appHeroes.isPresent()).toBeTruthy()
       expect(page.allHeroes.count()).toEqual(10, 'number of heroes')
     })
@@ -169,7 +105,7 @@ describe('Tutorial part 6', () => {
     it('can route to hero details', async () => {
       getHeroLiEltById(targetHero.id).click()
 
-      const page = getPageElts()
+      const page = getPageElements()
       expect(page.heroDetail.isPresent()).toBeTruthy('shows hero detail')
       const hero = await Hero.fromDetail(page.heroDetail)
       expect(hero.id).toEqual(targetHero.id)
@@ -189,29 +125,29 @@ describe('Tutorial part 6', () => {
     })
 
     it(`deletes ${newHeroName} from Heroes list`, async () => {
-      const heroesBefore = await toHeroArray(getPageElts().allHeroes)
+      const heroesBefore = await toHeroArray(getPageElements().allHeroes)
       const li = getHeroLiEltById(targetHero.id)
       li.element(by.buttonText('x')).click()
 
-      const page = getPageElts()
+      const page = getPageElements()
       expect(page.appHeroes.isPresent()).toBeTruthy()
       expect(page.allHeroes.count()).toEqual(9, 'number of heroes')
       const heroesAfter = await toHeroArray(page.allHeroes)
       // console.log(await Hero.fromLi(page.allHeroes[0]));
-      const expectedHeroes = heroesBefore.filter((h) => h.name !== newHeroName)
+      const expectedHeroes = heroesBefore.filter(h => h.name !== newHeroName)
       expect(heroesAfter).toEqual(expectedHeroes)
       // expect(page.selectedHeroSubview.isPresent()).toBeFalsy();
     })
 
     it(`adds back ${targetHero.name}`, async () => {
       const typedHeroName = 'Alice'
-      const heroesBefore = await toHeroArray(getPageElts().allHeroes)
+      const heroesBefore = await toHeroArray(getPageElements().allHeroes)
       const numHeroes = heroesBefore.length
 
       element(by.css('input')).sendKeys(typedHeroName)
       element(by.buttonText('add')).click()
 
-      const page = getPageElts()
+      const page = getPageElements()
       const heroesAfter = await toHeroArray(page.allHeroes)
       expect(heroesAfter.length).toEqual(numHeroes + 1, 'number of heroes')
 
@@ -228,7 +164,7 @@ describe('Tutorial part 6', () => {
     })
 
     it('displays correctly styled buttons', async () => {
-      element.all(by.buttonText('x')).then((buttons) => {
+      element.all(by.buttonText('x')).then(buttons => {
         for (const button of buttons) {
           // Inherited styles from styles.css
           expect(button.getCssValue('font-family')).toBe('Arial')
@@ -254,33 +190,33 @@ describe('Tutorial part 6', () => {
     beforeAll(() => browser.get(''))
 
     it(`searches for 'Ma'`, async () => {
-      getPageElts().searchBox.sendKeys('Ma')
+      getPageElements().searchBox.sendKeys('Ma')
       browser.sleep(1000)
 
-      expect(getPageElts().searchResults.count()).toBe(4)
+      expect(getPageElements().searchResults.count()).toBe(4)
     })
 
     it(`continues search with 'g'`, async () => {
-      getPageElts().searchBox.sendKeys('g')
+      getPageElements().searchBox.sendKeys('g')
       browser.sleep(1000)
-      expect(getPageElts().searchResults.count()).toBe(2)
+      expect(getPageElements().searchResults.count()).toBe(2)
     })
 
     it(`continues search with 'e' and gets ${targetHero.name}`, async () => {
-      getPageElts().searchBox.sendKeys('n')
+      getPageElements().searchBox.sendKeys('n')
       browser.sleep(1000)
-      const page = getPageElts()
+      const page = getPageElements()
       expect(page.searchResults.count()).toBe(1)
       const hero = page.searchResults.get(0)
       expect(hero.getText()).toEqual(targetHero.name)
     })
 
     it(`navigates to ${targetHero.name} details view`, async () => {
-      const hero = getPageElts().searchResults.get(0)
+      const hero = getPageElements().searchResults.get(0)
       expect(hero.getText()).toEqual(targetHero.name)
       hero.click()
 
-      const page = getPageElts()
+      const page = getPageElements()
       expect(page.heroDetail.isPresent()).toBeTruthy('shows hero detail')
       const hero2 = await Hero.fromDetail(page.heroDetail)
       expect(hero2.id).toEqual(targetHero.id)
@@ -289,12 +225,16 @@ describe('Tutorial part 6', () => {
   })
 
   async function dashboardSelectTargetHero() {
-    const targetHeroElt = getPageElts().topHeroes.get(targetHeroDashboardIndex)
+    const targetHeroElt = getPageElements().topHeroes.get(
+      targetHeroDashboardIndex
+    )
     expect(targetHeroElt.getText()).toEqual(targetHero.name)
-    targetHeroElt.click()
-    browser.waitForAngular() // seems necessary to gets tests to pass for toh-pt6
 
-    const page = getPageElts()
+    targetHeroElt.click()
+
+    browser.waitForAngular() // seems necessary to gets tests to pass
+
+    const page = getPageElements()
     expect(page.heroDetail.isPresent()).toBeTruthy('shows hero detail')
     const hero = await Hero.fromDetail(page.heroDetail)
     expect(hero.id).toEqual(targetHero.id)
@@ -305,12 +245,38 @@ describe('Tutorial part 6', () => {
     // Assumes that the current view is the hero details view.
     addToHeroName(nameSuffix)
 
-    const page = getPageElts()
+    const page = getPageElements()
     const hero = await Hero.fromDetail(page.heroDetail)
     expect(hero.id).toEqual(targetHero.id)
     expect(hero.name).toEqual(newHeroName.toUpperCase())
   }
 })
+
+function getPageElements() {
+  const navElements = element.all(by.css('app-root nav a'))
+
+  return {
+    navElements,
+
+    appDashboardHref: navElements.get(0),
+    appDashboard: element(by.css('app-root app-dashboard')),
+    topHeroes: element.all(
+      by.css('app-root app-dashboard app-dashboard-hero > div')
+    ),
+
+    appHeroesHref: navElements.get(1),
+    appHeroes: element(by.css('app-root app-heroes')),
+    allHeroes: element.all(by.css('app-root app-heroes li')),
+    selectedHeroSubview: element(
+      by.css('app-root app-heroes > div:last-child')
+    ),
+
+    heroDetail: element(by.css('app-root app-hero-detail > div')),
+
+    searchBox: element(by.css('#search-box')),
+    searchResults: element.all(by.css('.search-result li'))
+  }
+}
 
 function addToHeroName(text: string): promise.Promise<void> {
   const input = element(by.css('input'))
@@ -342,29 +308,3 @@ async function toHeroArray(allHeroes: ElementArrayFinder): Promise<Hero[]> {
   // The cast is necessary to get around issuing with the signature of Promise.all()
   return Promise.all(promisedHeroes) as Promise<any>
 }
-
-describe('workspace-project App', () => {
-  let page: AppPage
-
-  beforeEach(() => {
-    page = new AppPage()
-  })
-
-  it('should display welcome message', () => {
-    page.navigateTo()
-    expect(page.getTitleText()).toEqual('Angular Testing Course')
-  })
-
-  afterEach(async () => {
-    // Assert that there are no errors emitted from the browser
-    const logs = await browser
-      .manage()
-      .logs()
-      .get(logging.Type.BROWSER)
-    expect(logs).not.toContain(
-      jasmine.objectContaining({
-        level: logging.Level.SEVERE
-      } as logging.Entry)
-    )
-  })
-})
