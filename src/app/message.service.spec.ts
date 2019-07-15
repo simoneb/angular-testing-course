@@ -1,4 +1,4 @@
-import { TestBed, inject } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing'
 
 import { MessageService } from './message.service'
 
@@ -46,6 +46,7 @@ describe('MessageService tests using TestBed', () => {
     expect(service).toBeTruthy()
   })
 
+  // Exercises! Tip: inspire from the earlier tests
   it('should add a message')
 
   it('should clear messages')

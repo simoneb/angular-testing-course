@@ -8,6 +8,7 @@ import {
   ElementArrayFinder
 } from 'protractor'
 import { promise } from 'selenium-webdriver'
+
 import { Hero } from './hero'
 
 const expectedH1 = 'Angular Testing Course'
@@ -96,8 +97,10 @@ describe('Tour Of Heroes', () => {
     beforeAll(() => browser.get(''))
 
     it('can switch to Heroes view', () => {
-      getPageElements().appHeroesHref.click()
       const page = getPageElements()
+
+      page.appHeroesHref.click()
+
       expect(page.appHeroes.isPresent()).toBeTruthy()
       expect(page.allHeroes.count()).toEqual(10, 'number of heroes')
     })
@@ -106,8 +109,11 @@ describe('Tour Of Heroes', () => {
       getHeroLiEltById(targetHero.id).click()
 
       const page = getPageElements()
+
       expect(page.heroDetail.isPresent()).toBeTruthy('shows hero detail')
+
       const hero = await Hero.fromDetail(page.heroDetail)
+
       expect(hero.id).toEqual(targetHero.id)
       expect(hero.name).toEqual(targetHero.name.toUpperCase())
     })
@@ -119,35 +125,41 @@ describe('Tour Of Heroes', () => {
 
     it(`shows ${newHeroName} in Heroes list`, () => {
       element(by.buttonText('save')).click()
+
       browser.waitForAngular()
+
       const expectedText = `${targetHero.id} ${newHeroName}`
+
       expect(getHeroAEltById(targetHero.id).getText()).toEqual(expectedText)
     })
 
     it(`deletes ${newHeroName} from Heroes list`, async () => {
-      const heroesBefore = await toHeroArray(getPageElements().allHeroes)
+      const page = getPageElements()
+
+      const heroesBefore = await toHeroArray(page.allHeroes)
       const li = getHeroLiEltById(targetHero.id)
+
       li.element(by.buttonText('x')).click()
 
-      const page = getPageElements()
       expect(page.appHeroes.isPresent()).toBeTruthy()
       expect(page.allHeroes.count()).toEqual(9, 'number of heroes')
+
       const heroesAfter = await toHeroArray(page.allHeroes)
-      // console.log(await Hero.fromLi(page.allHeroes[0]));
       const expectedHeroes = heroesBefore.filter(h => h.name !== newHeroName)
+
       expect(heroesAfter).toEqual(expectedHeroes)
-      // expect(page.selectedHeroSubview.isPresent()).toBeFalsy();
     })
 
     it(`adds back ${targetHero.name}`, async () => {
+      const page = getPageElements()
+
       const typedHeroName = 'Alice'
-      const heroesBefore = await toHeroArray(getPageElements().allHeroes)
+      const heroesBefore = await toHeroArray(page.allHeroes)
       const numHeroes = heroesBefore.length
 
       element(by.css('input')).sendKeys(typedHeroName)
       element(by.buttonText('add')).click()
 
-      const page = getPageElements()
       const heroesAfter = await toHeroArray(page.allHeroes)
       expect(heroesAfter.length).toEqual(numHeroes + 1, 'number of heroes')
 
@@ -189,25 +201,33 @@ describe('Tour Of Heroes', () => {
   describe('Progressive hero search', () => {
     beforeAll(() => browser.get(''))
 
-    it(`searches for 'Ma'`, async () => {
+    it(`searches for 'Ma'`, () => {
       getPageElements().searchBox.sendKeys('Ma')
+
       browser.sleep(1000)
 
       expect(getPageElements().searchResults.count()).toBe(4)
     })
 
-    it(`continues search with 'g'`, async () => {
+    it(`continues search with 'g'`, () => {
       getPageElements().searchBox.sendKeys('g')
+
       browser.sleep(1000)
+
       expect(getPageElements().searchResults.count()).toBe(2)
     })
 
-    it(`continues search with 'e' and gets ${targetHero.name}`, async () => {
+    it(`continues search with 'e' and gets ${targetHero.name}`, () => {
       getPageElements().searchBox.sendKeys('n')
+
       browser.sleep(1000)
+
       const page = getPageElements()
+
       expect(page.searchResults.count()).toBe(1)
+
       const hero = page.searchResults.get(0)
+
       expect(hero.getText()).toEqual(targetHero.name)
     })
 
@@ -217,8 +237,11 @@ describe('Tour Of Heroes', () => {
       hero.click()
 
       const page = getPageElements()
+
       expect(page.heroDetail.isPresent()).toBeTruthy('shows hero detail')
+
       const hero2 = await Hero.fromDetail(page.heroDetail)
+
       expect(hero2.id).toEqual(targetHero.id)
       expect(hero2.name).toEqual(targetHero.name.toUpperCase())
     })
@@ -232,11 +255,14 @@ describe('Tour Of Heroes', () => {
 
     targetHeroElt.click()
 
-    browser.waitForAngular() // seems necessary to gets tests to pass
+    browser.waitForAngular()
 
     const page = getPageElements()
+
     expect(page.heroDetail.isPresent()).toBeTruthy('shows hero detail')
+
     const hero = await Hero.fromDetail(page.heroDetail)
+
     expect(hero.id).toEqual(targetHero.id)
     expect(hero.name).toEqual(targetHero.name.toUpperCase())
   }

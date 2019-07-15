@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing'
-import { HttpClientModule, HttpClient } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
+import {
+  HttpClientTestingModule,
+  HttpTestingController
+} from '@angular/common/http/testing'
 
 import { HeroService } from './hero.service'
 import { MessageService } from './message.service'
 import { asyncData } from './testing/async-helpers'
 import { HEROES } from './mock-heroes'
-import {
-  HttpClientTestingModule,
-  HttpTestingController
-} from '@angular/common/http/testing'
 
 describe('HeroService manual injection tests', () => {
   let service: HeroService
@@ -20,10 +20,10 @@ describe('HeroService manual injection tests', () => {
     service = new HeroService(httpClientSpy as any, new MessageService())
   })
 
-  it('should get heroes', (done) => {
+  it('should get heroes', done => {
     httpClientSpy.get.and.returnValue(asyncData(HEROES))
 
-    service.getHeroes().subscribe((heroes) => {
+    service.getHeroes().subscribe(heroes => {
       expect(heroes).toEqual(HEROES)
       done()
     }, fail)
@@ -44,13 +44,13 @@ describe('HeroService with Test Bed and manual Http mocking', () => {
     })
   })
 
-  it('should get heroes', (done) => {
+  it('should get heroes', done => {
     const service = TestBed.get(HeroService)
     const httpClientSpy = TestBed.get(HttpClient)
 
     httpClientSpy.get.and.returnValue(asyncData(HEROES))
 
-    service.getHeroes().subscribe((heroes) => {
+    service.getHeroes().subscribe(heroes => {
       expect(heroes).toEqual(HEROES)
       done()
     }, fail)
@@ -66,11 +66,11 @@ describe('HeroService Test Bed and Auto Http Mocking', () => {
     })
   })
 
-  it('should get heroes', (done) => {
+  it('should get heroes', done => {
     const service = TestBed.get(HeroService)
     const httpTestingController = TestBed.get(HttpTestingController)
 
-    service.getHeroes().subscribe((heroes) => {
+    service.getHeroes().subscribe(heroes => {
       expect(heroes).toEqual(HEROES)
       done()
     }, fail)
@@ -84,5 +84,6 @@ describe('HeroService Test Bed and Auto Http Mocking', () => {
     httpTestingController.verify()
   })
 
+  // Exercise!
   it('should log message when getting heroes')
 })

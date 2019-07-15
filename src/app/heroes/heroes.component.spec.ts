@@ -6,14 +6,14 @@ import {
   tick
 } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
-import { of } from 'rxjs'
 import { By } from '@angular/platform-browser'
+import { of } from 'rxjs'
 import { cold, getTestScheduler } from 'jasmine-marbles'
 
 import { HeroesComponent } from './heroes.component'
-import { asyncData } from '../testing/async-helpers'
 import { HEROES } from '../mock-heroes'
 import { HeroService } from '../hero.service'
+import { asyncData } from '../testing/async-helpers'
 
 describe('HeroesComponent Class behavior', () => {
   let heroServiceSpy: { getHeroes: jasmine.Spy }
@@ -62,6 +62,13 @@ describe('HeroesComponent Class behavior via TestBed', () => {
 
     expect(heroServiceSpy.addHero).toHaveBeenCalledWith({ name: heroName })
   })
+
+  /**
+   * 1) trigger hero deletion
+   * 2) assert that internal list is updates
+   * 3) assert that hero service has been called
+   */
+  it('should delete a hero')
 
   // fakeAsync preview (introduced later)
   it('should add returned hero to the internal list', fakeAsync(() => {
@@ -176,4 +183,12 @@ describe('HeroesComponent DOM Testing', () => {
 
     expect(heroesItems.length).toBe(HEROES.length)
   })
+
+  /**
+   * 1) render heroes
+   * 2) assert that the first hero in the DOM is the first hero returned by hero service
+   */
+  it(
+    'should render the first hero returned by hero service as the first item of the list'
+  )
 })

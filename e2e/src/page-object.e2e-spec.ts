@@ -11,7 +11,14 @@ xdescribe('Page Object tests', () => {
 
   it('should display welcome message', () => {
     page.navigateTo()
+
     expect(page.getTitleText()).toEqual('Angular Testing Course')
+  })
+
+  it('should display welcome message [async]', async () => {
+    await page.navigateTo()
+
+    expect(await page.getTitleText()).toEqual('Angular Testing Course')
   })
 
   afterEach(async () => {
@@ -20,10 +27,11 @@ xdescribe('Page Object tests', () => {
       .manage()
       .logs()
       .get(logging.Type.BROWSER)
+
     expect(logs).not.toContain(
       jasmine.objectContaining({
         level: logging.Level.SEVERE
-      } as logging.Entry)
+      })
     )
   })
 })

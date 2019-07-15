@@ -26,8 +26,10 @@ export class Hero {
       .all(by.css('div'))
       .first()
       .getText()
+
     // Get name from the h2
     const name = await detail.element(by.css('h2')).getText()
+
     return {
       id: +id.substr(id.indexOf(' ') + 1),
       name: name.substr(0, name.lastIndexOf(' '))
