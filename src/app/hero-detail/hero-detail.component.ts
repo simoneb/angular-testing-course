@@ -15,7 +15,7 @@ export class HeroDetailComponent implements OnInit {
   lat = 45.40298
   lng = 10.9659241
 
-  @Input() hero: Hero
+  hero: Hero
 
   constructor(
     private route: ActivatedRoute,

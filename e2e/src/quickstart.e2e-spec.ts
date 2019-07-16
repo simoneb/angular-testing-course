@@ -1,4 +1,4 @@
-import { browser, element, by, $$ } from 'protractor'
+import { browser, element, by, $, $$ } from 'protractor'
 
 import { writeScreenShot } from './testing/file-system'
 
@@ -16,7 +16,7 @@ describe('tour of heroes e2e quick start', () => {
   })
 
   it('should search for a hero', () => {
-    const searchBox = element(by.id('search-box'))
+    const searchBox = $('#search-box')
 
     searchBox.sendKeys('magne')
 
@@ -62,7 +62,29 @@ describe('tour of heroes e2e quick start', () => {
   // 3) change the hero name
   // 4) save the hero
   // 5) assert that the hero has a new name
-  it('should save a hero new name')
+  it('should save a hero new name', async () => {
+    const searchBox = $('#search-box')
+
+    // search
+    await searchBox.sendKeys('magne')
+    await browser.waitForAngular()
+
+    // navigate to detail
+    await $('ul.search-result > li').click()
+
+    // change name
+    await $('input').sendKeys('-Z')
+    await element(by.cssContainingText('button', 'save')).click()
+
+    // search
+    await searchBox.sendKeys('magne')
+    await browser.waitForAngular()
+
+    // assert new name
+    expect(await $('ul.search-result > li > a').getText()).toContain(
+      'Magneta-Z'
+    )
+  })
 
   // 1) navigate to the heroes page
   // 2) delete a hero
@@ -70,6 +92,8 @@ describe('tour of heroes e2e quick start', () => {
   it('should delete a hero')
 
   it('should take a screenshot', async () => {
+    await browser.waitForAngular()
+
     const png = await browser.takeScreenshot()
 
     writeScreenShot(png, __dirname + '/screenshots/screenshot.png')

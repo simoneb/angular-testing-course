@@ -50,7 +50,7 @@ describe('AppComponent', () => {
       By.directive(RouterLinkStubDirective)
     )
 
-    const routerLinks = linkDebugElements.map((de) =>
+    const routerLinks = linkDebugElements.map(de =>
       de.injector.get(RouterLinkStubDirective)
     )
 
@@ -66,7 +66,7 @@ describe('AppComponent', () => {
       By.directive(RouterLinkStubDirective)
     )
 
-    const routerLinks = linkDebugElements.map((de) =>
+    const routerLinks = linkDebugElements.map(de =>
       de.injector.get(RouterLinkStubDirective)
     )
 

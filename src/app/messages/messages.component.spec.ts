@@ -8,11 +8,11 @@ describe('MessagesComponent with real dependencies', () => {
   let component: MessagesComponent
   let fixture: ComponentFixture<MessagesComponent>
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [MessagesComponent]
     }).compileComponents()
-  }))
+  })
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MessagesComponent)
@@ -81,7 +81,24 @@ describe('MessagesComponent with real dependencies', () => {
     expect(messageDiv.nativeElement.textContent).toBe(messageText)
   })
 
-  it('should display 2 messages')
+  it('should display 2 messages', () => {
+    const messageTexts = ['hello testing world', 'another message']
+    const messageService = TestBed.get(MessageService)
+
+    messageService.add(messageTexts[0])
+    messageService.add(messageTexts[1])
+
+    // IMPORTANT
+    fixture.detectChanges()
+
+    const messageDivs = fixture.debugElement
+      .query(By.css('div'))
+      .children.filter(By.css('div'))
+
+    expect(messageDivs.length).toBe(2)
+    expect(messageDivs[0].nativeElement.textContent).toBe(messageTexts[0])
+    expect(messageDivs[1].nativeElement.textContent).toBe(messageTexts[1])
+  })
 
   it('should clear messages', () => {
     const messageService = TestBed.get(MessageService)

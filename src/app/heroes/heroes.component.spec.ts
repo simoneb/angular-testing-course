@@ -7,6 +7,7 @@ import {
 } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { By } from '@angular/platform-browser'
+import { RouterLinkWithHref } from '@angular/router'
 import { of } from 'rxjs'
 import { cold, getTestScheduler } from 'jasmine-marbles'
 
@@ -14,6 +15,7 @@ import { HeroesComponent } from './heroes.component'
 import { HEROES } from '../mock-heroes'
 import { HeroService } from '../hero.service'
 import { asyncData } from '../testing/async-helpers'
+import { Hero } from '../hero'
 
 describe('HeroesComponent Class behavior', () => {
   let heroServiceSpy: { getHeroes: jasmine.Spy }
@@ -41,7 +43,10 @@ describe('HeroesComponent Class behavior via TestBed', () => {
         HeroesComponent,
         {
           provide: HeroService,
-          useValue: jasmine.createSpyObj('HeroService', ['addHero'])
+          useValue: jasmine.createSpyObj('HeroService', [
+            'addHero',
+            'deleteHero'
+          ])
         }
       ]
     })
@@ -65,10 +70,27 @@ describe('HeroesComponent Class behavior via TestBed', () => {
 
   /**
    * 1) trigger hero deletion
-   * 2) assert that internal list is updates
+   * 2) assert that internal list is updated
    * 3) assert that hero service has been called
    */
-  it('should delete a hero')
+  it('should delete a hero', () => {
+    const component = TestBed.get(HeroesComponent)
+    const heroServiceSpy = TestBed.get(HeroService)
+
+    heroServiceSpy.deleteHero.and.returnValue(of())
+
+    const hercules: Hero = {
+      id: 1,
+      name: 'hercules'
+    }
+
+    component.heroes = [hercules]
+
+    component.delete(hercules)
+
+    expect(component.heroes.length).toBe(0)
+    expect(heroServiceSpy.deleteHero).toHaveBeenCalledWith(hercules)
+  })
 
   // fakeAsync preview (introduced later)
   it('should add returned hero to the internal list', fakeAsync(() => {
@@ -188,7 +210,24 @@ describe('HeroesComponent DOM Testing', () => {
    * 1) render heroes
    * 2) assert that the first hero in the DOM is the first hero returned by hero service
    */
-  it(
-    'should render the first hero returned by hero service as the first item of the list'
-  )
+  it('should render the first hero returned by hero service as the first item of the list', () => {
+    const heroServiceSpy = TestBed.get(HeroService)
+
+    const q$ = cold('---x|', { x: HEROES })
+    heroServiceSpy.getHeroes.and.returnValue(q$)
+
+    fixture.detectChanges()
+
+    getTestScheduler().flush()
+
+    fixture.detectChanges()
+
+    const firstHeroItem = fixture.debugElement.query(
+      By.directive(RouterLinkWithHref)
+    )
+
+    expect(
+      firstHeroItem.query(By.css('span.badge')).nativeElement.textContent
+    ).toBe(HEROES[0].id.toString())
+  })
 })

@@ -10,7 +10,7 @@ describe('MessageService simple tests', () => {
   })
 
   it('should not have any messages', () => {
-    expect(service.messages.length).toBe(0)
+    expect(service.messages.length).toEqual(0)
   })
 
   it('should add a message', () => {
@@ -47,7 +47,20 @@ describe('MessageService tests using TestBed', () => {
   })
 
   // Exercises! Tip: inspire from the earlier tests
-  it('should add a message')
+  it('should add a message', () => {
+    const service = TestBed.get(MessageService)
 
-  it('should clear messages')
+    service.add('my message')
+
+    expect(service.messages.length).toBe(1)
+  })
+
+  it('should clear messages', () => {
+    const service = TestBed.get(MessageService)
+
+    service.add('my message')
+    service.clear()
+
+    expect(service.messages.length).toBe(0)
+  })
 })

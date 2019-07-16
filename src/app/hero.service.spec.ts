@@ -62,7 +62,13 @@ describe('HeroService with Test Bed and manual Http mocking', () => {
 describe('HeroService Test Bed and Auto Http Mocking', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: MessageService,
+          useValue: jasmine.createSpyObj('MessageService', ['add'])
+        }
+      ]
     })
   })
 
@@ -85,5 +91,18 @@ describe('HeroService Test Bed and Auto Http Mocking', () => {
   })
 
   // Exercise!
-  it('should log message when getting heroes')
+  it('should log message when getting heroes', done => {
+    const service = TestBed.get(HeroService)
+    const httpTestingController = TestBed.get(HttpTestingController)
+    const messageServiceSpy = TestBed.get(MessageService)
+
+    service.getHeroes().subscribe(_ => {
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(
+        'HeroService: fetched heroes'
+      )
+      done()
+    })
+
+    httpTestingController.expectOne('api/heroes').flush(HEROES)
+  })
 })

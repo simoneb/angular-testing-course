@@ -67,7 +67,10 @@ describe('HighlightDirective', () => {
     input.dispatchEvent(new Event('input'))
     fixture.detectChanges()
 
-    expect(input.style.backgroundColor).toBe('green', 'changed backgroundColor')
+    expect(input.style.backgroundColor).toBe(
+      'green',
+      'changed backgroundColor'
+    )
   })
 
   it('bare <h2> should not have a customProperty', () => {
