@@ -8,7 +8,7 @@ import {
 import { RouterTestingModule } from '@angular/router/testing'
 import { By } from '@angular/platform-browser'
 import { RouterLinkWithHref } from '@angular/router'
-import { of } from 'rxjs'
+import { of, ReplaySubject } from 'rxjs'
 import { cold, getTestScheduler } from 'jasmine-marbles'
 
 import { HeroesComponent } from './heroes.component'
@@ -58,7 +58,7 @@ describe('HeroesComponent Class behavior via TestBed', () => {
 
     const heroName = 'hercules'
 
-    heroServiceSpy.addHero.and.callFake(hero =>
+    heroServiceSpy.addHero.and.callFake((hero) =>
       asyncData({ id: 1000, ...hero })
     )
 
@@ -99,7 +99,7 @@ describe('HeroesComponent Class behavior via TestBed', () => {
 
     const heroName = 'hercules'
 
-    heroServiceSpy.addHero.and.callFake(hero =>
+    heroServiceSpy.addHero.and.callFake((hero) =>
       asyncData({ id: 1000, ...hero })
     )
 
@@ -204,6 +204,45 @@ describe('HeroesComponent DOM Testing', () => {
     const heroesItems = fixture.debugElement.queryAll(By.css('li'))
 
     expect(heroesItems.length).toBe(HEROES.length)
+  })
+
+  /**
+   * This is an example that uses a ReplaySubject to control the emission of the observable
+   * returned by HeroService over time.
+   */
+  it('should render heroes over time', async () => {
+    const heroServiceSpy = TestBed.get(HeroService)
+    const getFirstHeroListItem = () => fixture.debugElement.query(By.css('li'))
+
+    const heroesSubject = new ReplaySubject<Hero[]>()
+
+    heroServiceSpy.getHeroes.and.returnValue(heroesSubject.asObservable())
+
+    // ngOnInit
+    fixture.detectChanges()
+
+    // no heroes returned yet
+    expect(getFirstHeroListItem()).toBeFalsy()
+
+    // emit an array with one hero
+    heroesSubject.next(HEROES.slice(0, 1))
+
+    fixture.detectChanges()
+
+    expect(
+      getFirstHeroListItem().query(By.css('span.badge')).nativeElement
+        .textContent
+    ).toBe(HEROES[0].id.toString())
+
+    // emit an array with another hero
+    heroesSubject.next(HEROES.slice(1, 2))
+
+    fixture.detectChanges()
+
+    expect(
+      getFirstHeroListItem().query(By.css('span.badge')).nativeElement
+        .textContent
+    ).toBe(HEROES[1].id.toString())
   })
 
   /**
